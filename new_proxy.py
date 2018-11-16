@@ -57,7 +57,10 @@ while True:
                 #Connect to website
                 c = socket(AF_INET, SOCK_STREAM)
                 c.connect((ip, 80))
-                s = "GET "+ "http://" + fullname + " HTTP/1.0\n\n"
+                s = "GET "+ "http://" + fullname + " HTTP/1.0\n"
+                s += "Host: " + hostn + "\n\n"
+                #Add the parts of the message for sending
+                #Host: header.  for cloudflare
                 print("--------------------")
                 print(s)
                 print("--------------------")
