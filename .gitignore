@@ -1,1 +1,8 @@
+#Ignore compiled Python
 __pycache__
+
+#Ignore cached Web Objects
+cache/*
+
+#Ignore swp files for vim session
+*.swp

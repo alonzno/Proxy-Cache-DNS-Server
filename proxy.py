@@ -1,6 +1,4 @@
 from socket import *
-import urllib.request
-#import sys
 import os
 import _thread
 
@@ -13,7 +11,7 @@ def start_proxy_server(ip_to_bind):
 
     tcpSerSock = socket(AF_INET, SOCK_STREAM)
 
-    tcpSerSock.bind((ip_to_bind, 8887))
+    tcpSerSock.bind((ip_to_bind, 8888))
     tcpSerSock.listen(10)
     path = os.getcwd()
     os.chdir(path + "/cache/")
@@ -67,7 +65,6 @@ def start_proxy_server(ip_to_bind):
                     s = "GET "+ "http://" + fullname + " HTTP/1.0\n"
                     s += "Host: " + hostn + "\n\n"
 
-                    #Host: header.  for cloudflare
                     #print("--------------------")
                     #print(s)
                     #print("--------------------")
@@ -76,13 +73,12 @@ def start_proxy_server(ip_to_bind):
                     fileobj.flush()
                     buf = fileobj.read()
 
-                    #os.chdir(path + "/cache/")
                     #REVISE BELOW THIS
                     if not os.path.exists(os.path.dirname(fullname)):
                         try:
                             os.makedirs(os.path.dirname(fullname))
-                        except OSError as exc: # Guard against race condition
-                            if exc.errno != errno.EEXIST:
+                        except OSError as err:
+                            if err.errno != errno.EEXIST:
                                 raise
                     #REVISE ABOVE THIS
                     #os.chdir(path)
