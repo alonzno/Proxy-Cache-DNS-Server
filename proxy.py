@@ -57,6 +57,16 @@ while 1:
                 # Fill in end.
                 # Create a new file in the cache for the requested file.  
                 # Also send the response in the buffer to client socket and the corresponding file in the cache 
+                
+                #REVISE THIS
+                if not os.path.exists(os.path.dirname(filename)):
+                    try:
+                        os.makedirs(os.path.dirname(filename))
+                    except OSError as exc: # Guard against race condition
+                        if exc.errno != errno.EEXIST:
+                            raise
+                #REVISE ABOVE THIS
+                
                 tmpFile = open("./" + filename,"wb")
                 # Fill in start. 
                 tmpFile.write(buf)
