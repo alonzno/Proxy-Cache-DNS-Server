@@ -1,14 +1,12 @@
+from re import match
+
 from socket import *
 import os
 import _thread
+#import sys         #DEBUG
+#import linecache   #DEBUG
 
 def start_proxy_server(ip_to_bind):
-    '''
-    if len(sys.argv) <= 1:
-        print('Usage : "python ProxyServer.py server_ip"\n[server_ip : It is the IP  Address Of Proxy Server')
-        sys.exit(2)
-    '''
-
     tcpSerSock = socket(AF_INET, SOCK_STREAM)
 
     tcpSerSock.bind((ip_to_bind, 8888))
@@ -27,14 +25,11 @@ def start_proxy_server(ip_to_bind):
 
         fullname = message.split()[1]
         fullname = fullname.replace("http://","")
-        #fullname = str(fullname[:-1])
 
-        #print(filename)
         print("fullname", fullname)
         print("filename", filename)
         fileExist = False
         fileToUse = "./cache/" + fullname + "_FILE"
-        #print(fileToUse)
         try:
             f = open("./" + fullname + "_FILE", "rb")
             outputData = f.read()
@@ -51,12 +46,33 @@ def start_proxy_server(ip_to_bind):
                         hostn = str(filename[1:]).replace("/www.", "", 1).partition("/")[0]
                     else:
                         hostn = filename.replace("/www.", "", 1).partition("/")[0]
-                    #print("hostname", hostn)
-                    #print(filename)
-                    ip = gethostbyname(hostn)
+                    #Handle the case of non port ip:port pattern
+                    if match("([0-9]+\.){3}[0-9]+:[0-9]+", hostn):
+                        items = hostn.partition(":")
+                        ip = items[0]
+                        port = int(items[2])
+                        c = socket(AF_INET, SOCK_STREAM)
+                        c.connect((ip, port))
+                        s = "GET "+ "http://" + fullname + " HTTP/1.0\n"
+                        s += "Host: " + hostn + "\n\n"
+
+                        fileobj = c.makefile("rwb", 256)
+                        fileobj.write(s.encode())
+                        fileobj.flush()
+                        buf = fileobj.read()
+
+                        if not os.path.exists(os.path.dirname(fullname)):
+                            try:
+                                os.makedirs(os.path.dirname(fullname))
+                            except OSError as err:
+                                if err.errno != errno.EEXIST:
+                                    raise
+                        return
+                    else:
+                        ip = gethostbyname(hostn)
                     print("IP Address", ip)
                     if ip == "0.0.0.0":
-                        #Yo fix this, bad move
+                        #DNS did not resolve the IP of hostname
                         return
 
                     #Connect to website
@@ -65,23 +81,17 @@ def start_proxy_server(ip_to_bind):
                     s = "GET "+ "http://" + fullname + " HTTP/1.0\n"
                     s += "Host: " + hostn + "\n\n"
 
-                    #print("--------------------")
-                    #print(s)
-                    #print("--------------------")
                     fileobj = c.makefile("rwb", 256)
                     fileobj.write(s.encode())
                     fileobj.flush()
                     buf = fileobj.read()
 
-                    #REVISE BELOW THIS
                     if not os.path.exists(os.path.dirname(fullname)):
                         try:
                             os.makedirs(os.path.dirname(fullname))
-                        except OSError as err:
-                            if err.errno != errno.EEXIST:
+                        except OSError as e:
+                            if e.errno != errno.EEXIST:
                                 raise
-                    #REVISE ABOVE THIS
-                    #os.chdir(path)
 
                     #Only Cache objects less that 10MB
                     if len(buf) < 10000000:
@@ -89,6 +99,18 @@ def start_proxy_server(ip_to_bind):
                         tmpFile.write(buf)
                     tcpCliSock.send(buf)
                 except Exception as e:
+                    #Begin DEBUG
+                    '''
+                    exc_type, exc_obj, tb = sys.exc_info()
+                    f = tb.tb_frame
+                    lineno = tb.tb_lineno
+                    filename = f.f_code.co_filename
+                    linecache.checkcache(filename)
+                    line = linecache.getline(filename, lineno, f.f_globals)
+                    print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
+                    print("============================")
+                    '''
+                    #End DEBUG
                     print(e)
                     print(type(e))
                     print(e.args)

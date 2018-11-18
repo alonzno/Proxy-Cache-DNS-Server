@@ -11,7 +11,7 @@ class getHandler(BaseHTTPRequestHandler):
 
 def start_server(ip_to_bind):
     
-    addr = (ip_to_bind, 8889)
+    addr = (ip_to_bind, 80)
     httpd = HTTPServer(addr, getHandler)
     httpd.serve_forever()
 
