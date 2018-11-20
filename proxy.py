@@ -8,7 +8,7 @@ import datetime
 def start_proxy_server(ip_to_bind):
     tcpSerSock = socket(AF_INET, SOCK_STREAM)
 
-    tcpSerSock.bind((ip_to_bind, 8887))
+    tcpSerSock.bind((ip_to_bind, 8888))
     tcpSerSock.listen(10)
     path = os.getcwd()
     os.chdir(path + "/cache/")

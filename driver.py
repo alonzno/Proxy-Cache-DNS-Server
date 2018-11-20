@@ -3,12 +3,15 @@ import signal
 
 import proxy
 import server
+import dns
 
 def start_proxy():
     proxy.start_proxy_server("127.0.0.1")
 
 def start_server():
     server.start_server("127.0.0.1")
+def start_dns():
+    dns.start_dns("127.0.0.1")
 
 pids = []
 
@@ -30,8 +33,13 @@ if __name__ == "__main__":
             start_proxy()
         else:
             pids.append(newpid)
-            while user_in != "quit":
-                user_in = input("Type quit to kill all processes")
-            for pid in pids:
-                os.kill(pid, signal.SIGTERM)
+            newpid = os.fork()
+            if newpid == 0:
+                start_dns()
+            else:
+                pids.append(newpid)
+                while user_in != "quit":
+                    user_in = input("Type quit to kill all processes")
+                for pid in pids:
+                    os.kill(pid, signal.SIGTERM)
 
