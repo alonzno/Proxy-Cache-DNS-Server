@@ -1,0 +1,10 @@
+{
+	"Records": {
+		"www.altamirano.432": {
+			"Name": "www.altamirano.432",
+			"Type": "A",
+			"Value": "127.0.0.1",
+			"TTL": "400"
+		}
+	}
+}
