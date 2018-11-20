@@ -4,7 +4,6 @@ import json
 def read_zone():
     f = open("zones/www.altamirano.432.zone")
     data = json.load(f)
-    print(data)
     return data
 
 zone = read_zone()
@@ -21,7 +20,6 @@ def getRR(data):
         rr = zone['Records']['.'.join(host_name)]
         return (rr, host_name);
     except:
-        print("Not in DNS")
         return (None, host_name)
     pass
 
@@ -49,8 +47,6 @@ def getRRDomain(data):
         byte_counter += 1
 
     q_type = data[byte_counter:byte_counter+2]
-    print(host_name)
-    print(q_type)
     return (host_name, q_type)
 def questionToBytes(name):
     retB = b''
@@ -101,14 +97,11 @@ def extractFlags(data, error = False):
 
 
     flags = [qr, opcode, aa, tc, rd, ra, z, rcode]
-    #print("".join(flags))
     return int("".join(list(flags[0:5])), 2).to_bytes(1, byteorder = 'big') + int("".join(list(flags[5:])), 2).to_bytes(1, byteorder = 'big')
 
 def makeResponse(data):
     transId = data[0:2]
     
-    print("Transaction ID")
-    [ print(hex(x)) for x in transId ]
     
     flagBytes = data[2:4]
     flags = extractFlags(flagBytes)
@@ -128,7 +121,6 @@ def makeResponse(data):
     else:
         acount = b'\x00\x01'
         dnsheader = transId + flags + qcount + acount + nscount + arcount
-        print(dnsheader)
         dnsbody = questionToBytes(host_name) + recordToBytes(host_name, rr['Type'], rr['Value'], rr['TTL'])
         return dnsheader + dnsbody
 

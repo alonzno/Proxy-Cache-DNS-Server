@@ -4,7 +4,6 @@ class getHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.path = self.path.replace("http://", "")
         self.path = "/" + self.path.partition("/")[2]
-        print("Path", self.path)
         if self.path == "/":
             f = open("./www/index.html", "rb")
             self.send_response(200)

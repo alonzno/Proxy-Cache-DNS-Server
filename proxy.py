@@ -17,7 +17,6 @@ def start_proxy_server(ip_to_bind):
 
     def handle_client(tcpCliSock):
         message = str(tcpCliSock.recv(4096))
-        print(message)
 
         filename = message.split()[1]
         if '/' in filename:
@@ -27,8 +26,6 @@ def start_proxy_server(ip_to_bind):
         fullname = message.split()[1]
         fullname = fullname.replace("http://","")
 
-        print("fullname", fullname)
-        print("filename", filename)
         fileExist = False
         fileToUse = "./cache/" + fullname + "_FILE"
         try:
@@ -47,7 +44,6 @@ def start_proxy_server(ip_to_bind):
                 addr = (ip, port)
             else:
                 ip = gethostbyname(hostn)
-                print("IP Address", ip)
                 if ip == "0.0.0.0":
                     #DNS did not resolve the IP of hostname
                     return
@@ -64,17 +60,13 @@ def start_proxy_server(ip_to_bind):
             fileobj.write(s.encode())
             fileobj.flush()
             buf = fileobj.read()
-            print(buf.decode())
 
             statbuf = os.stat("./" + fullname + "_FILE")
-            print("Modification time: {}".format(statbuf.st_mtime))
-            print("Modification datetime: {}".format(datetime.datetime.fromtimestamp(statbuf.st_mtime)))
 
             outputData = f.read()
             fileExist = True
 
             tcpCliSock.send(outputData)
-            print("Read from cache")
 
         except IOError:
             if not fileExist:
@@ -112,7 +104,6 @@ def start_proxy_server(ip_to_bind):
                         buf = sendGet((ip, port))
                     else:
                         ip = gethostbyname(hostn)
-                        print("IP Address", ip)
                         if ip == "0.0.0.0":
                             #DNS did not resolve the IP of hostname
                             return
@@ -126,18 +117,13 @@ def start_proxy_server(ip_to_bind):
 
                     tcpCliSock.send(buf)
                 except Exception as e:
-                    print(e)
-                    print(type(e))
-                    print(e.args)
-                    print("Illegal request")
+                    pass
             else:
                 pass
         tcpCliSock.close()
 
     while True:
-        print("Ready to serve..")
         tcpCliSock, addr = tcpSerSock.accept()
-        print("Received a connection from:", addr)
         _thread.start_new_thread( handle_client, (tcpCliSock, ) )
 
 if __name__ == "__main__":
