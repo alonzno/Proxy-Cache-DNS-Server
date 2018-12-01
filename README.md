@@ -10,7 +10,7 @@ The program has three main programs.
 This is the proxy server / web cache.
 By default it will operate on localhost port 8888.  This can easily be 
 modified at the head of the program.  This web proxy only operates HTTP 1.0.
-It will cache objects smaller than 10MB.
+It will cache objects smaller than 10Mb.
 Records are written to the `./cache/` directory.
 On a Mac you should configure your network settings to use localhost:8888 as
 the HTTP proxy at: 
